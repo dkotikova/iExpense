@@ -35,8 +35,7 @@ class Expenses {
 
 struct ContentView: View {
     @State private var expenses = Expenses()
-    
-    @State private var showingAddExpense = false 
+    @State private var showingAddExpense = false
     
     var body: some View {
         NavigationStack {
@@ -68,11 +67,9 @@ struct ContentView: View {
                             if let fullIndex = expenses.items.firstIndex(where: { $0.id == item.id }) {
                                 expenses.items.remove(at: fullIndex)
                             }
-
                         }
                         
                     }
-
                 }
                 
                 Section("Business") {
@@ -91,7 +88,7 @@ struct ContentView: View {
                             
                             Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                                 .font(.headline)
-                                .foregroundColor(item.amount < 10 ? .green : item.amount < 100 ? .yellow : .red)
+                                .foregroundColor(item.amount < 500 ? .green : item.amount < 5000 ? .yellow : .red)
                         }
                         
                     }
@@ -110,15 +107,18 @@ struct ContentView: View {
             }
             .navigationTitle("iExpence")
             .toolbar {
-                Button("Add Expence", systemImage: "plus") {
-                    showingAddExpense = true
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add Expence", systemImage: "plus") {
+                        showingAddExpense = true
+                    }
                 }
             }
-            .sheet(isPresented: $showingAddExpense) {
+            
+            .navigationDestination(isPresented: $showingAddExpense) {
                 AddView(expenses: expenses)
+                    .navigationBarBackButtonHidden(true)
             }
         }
-
         
         }
     
