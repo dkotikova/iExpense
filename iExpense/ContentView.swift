@@ -35,7 +35,6 @@ class Expenses {
 
 struct ContentView: View {
     @State private var expenses = Expenses()
-    @State private var showingAddExpense = false
     
     var body: some View {
         NavigationStack {
@@ -59,8 +58,7 @@ struct ContentView: View {
                                 .font(.headline)
                                 .foregroundColor(item.amount < 10 ? .green : item.amount < 100 ? .yellow : .red)
                         }
-                    
-                }
+                    }
                     .onDelete { offsets in
                         for offset in offsets {
                             let item = personalItems[offset]
@@ -107,23 +105,22 @@ struct ContentView: View {
             .navigationTitle("iExpence")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add Expence", systemImage: "plus") {
-                        showingAddExpense = true
+                    NavigationLink {
+                        AddView(expenses: expenses)
+                            .navigationBarBackButtonHidden(true)
+                    } label: {
+                        Label("Add Expence", systemImage: "plus")
                     }
                 }
             }
-            .navigationDestination(isPresented: $showingAddExpense) {
-                AddView(expenses: expenses)
-                    .navigationBarBackButtonHidden(true)
-            }
         }
         
-        }
+    }
     
     func removeItems(at offsets: IndexSet) {
         expenses.items.remove(atOffsets: offsets)
     }
-    }
+}
 
 
 #Preview {
