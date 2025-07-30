@@ -103,7 +103,6 @@ struct ContentView: View {
                     }
                     
                 }
-
             }
             .navigationTitle("iExpence")
             .toolbar {
@@ -113,7 +112,6 @@ struct ContentView: View {
                     }
                 }
             }
-            
             .navigationDestination(isPresented: $showingAddExpense) {
                 AddView(expenses: expenses)
                     .navigationBarBackButtonHidden(true)
