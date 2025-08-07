@@ -10,30 +10,26 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) var modelContext
+    @Query var allItems: [ExpenseItem]
     
-    @Query(filter: #Predicate<ExpenseItem> { expense in
-        expense.type == "Personal"}) var personalItems: [ExpenseItem]
-    @Query(filter: #Predicate<ExpenseItem> { expense in
-        expense.type == "Business"}) var businessItems: [ExpenseItem]
+    @State private var selectedType = "All"
+    @State private var sortOrder = SortDescriptor(\ExpenseItem.name)
+    
+    let types = ["All", "Personal", "Business"]
+    
+    var filteredItems: [ExpenseItem] {
+        let filtered = selectedType == "All" ? allItems : allItems.filter { expense in
+            expense.type == selectedType }
+        return filtered.sorted(using: [sortOrder])
+    }
     
     var body: some View {
         NavigationStack {
             List {
-                
-                Section("Personal") {
-                    ForEach(personalItems) { item in
-                        ExpenseRow(item: item)
-                    }
-                    .onDelete(perform: deletePersonalItem)
+                ForEach(filteredItems) { item in
+                    ExpenseRow(item: item)
                 }
-                
-                Section("Business") {
-                    ForEach(businessItems) { item in
-                        ExpenseRow(item: item)
-                    }
-                    .onDelete(perform: deleteBusinessItem)
-                    
-                }
+                .onDelete(perform: deleteItem)
             }
             .navigationTitle("iExpence")
             .toolbar {
@@ -45,21 +41,38 @@ struct ContentView: View {
                         Label("Add Expence", systemImage: "plus")
                     }
                 }
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("Sort", selection: $sortOrder) {
+                            Text("Sort by Name")
+                                .tag(SortDescriptor(\ExpenseItem.name))
+                            Text("Sort by Amount")
+                                .tag(SortDescriptor(\ExpenseItem.amount))
+                        }
+                    } label: {
+                        Label("Sort", systemImage: "arrow.up.arrow.down")
+                    }
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Picker("Filter", selection: $selectedType) {
+                        ForEach(types, id: \.self) { type in
+                            Text(type)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
             }
         }
     }
     
-    func deletePersonalItem(at offsets: IndexSet) {
+    func deleteItem(at offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(personalItems[index])
+            modelContext.delete(filteredItems[index])
         }
     }
     
-    func deleteBusinessItem(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(businessItems[index])
-        }
-    }
 }
 
 struct ExpenseRow: View {

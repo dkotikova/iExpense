@@ -13,12 +13,10 @@ class ExpenseItem {
     var name: String
     var type: String
     var amount: Double
-    var date: Date
     
-    init(name: String, type: String, amount: Double, date: Date = .now) {
+    init(name: String, type: String, amount: Double) {
         self.name = name
         self.type = type
         self.amount = amount
-        self.date = date
     }
 }
